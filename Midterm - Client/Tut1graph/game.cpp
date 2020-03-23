@@ -284,7 +284,12 @@ bool initNetwork() {
 void game::update() {
 	updateTimer->tick();
 
+	
 	initNetwork();
+
+	float deltaTime = updateTimer->getElapsedTimeS();
+
+	
 
 	float time = 0.0;
 	float previous = updateTimer->getCurrentTime();//glfwGetTime();
@@ -296,40 +301,19 @@ void game::update() {
 	int tx = 2;
 	int ty = 4;
 
+	
 
 	// When timer goes off, send an update
 	time -= delta;
-	if (time <= 0.f)
-	{
-		// Code to send position updates go HERE...
-		char message[BUFLEN];
-		//char message2[BUFLEN];
-
-		std::string msg = std::to_string(clientId) + "$" + std::to_string(brickCount) + "=" + std::to_string(ball.localPosition.x) + "@" + std::to_string(ball.localPosition.y) + "_" + std::to_string(Paddle.localPosition.x) + "(" + std::to_string(Paddle.localPosition.y);
-		
-
-		strcpy(message, (char*)msg.c_str());
-
-		
-		if (sendto(client_socket, message, BUFLEN, 0, ptr->ai_addr, ptr->ai_addrlen) == SOCKET_ERROR)
-		{
-			std::cout << "Sendto() failed...\n" << std::endl;
-		}
-		
-		std::cout << "Ball position X and Ball position Y: " << message << std::endl;
-		std::cout << "Update Interval: " << UPDATE_INTERVAL << std::endl;
-		memset(message, '/0', BUFLEN);
-
-		time = UPDATE_INTERVAL; // reset the timer
-
-	}
+	
 	
 
-	float deltaTime = updateTimer->getElapsedTimeS();
+
+	
 
 	glm::vec3 currentPaddlePosition = Paddle.getLocalPosition();
 	glm::vec3 currentBallPosition = ball.getLocalPosition();
-	glm::vec3 tempPosition = currentBallPosition;
+	glm::vec3 previousPosition = currentBallPosition;
 
 	if (ballCount <= 3) {
 		if (brickCount <= 12) {
@@ -356,6 +340,8 @@ void game::update() {
 			else if (currentPaddlePosition.x <= -8.4) {
 				currentPaddlePosition.x += 0.2f;
 			}
+
+
 			if (currentBallPosition.y <= -8.4) {
 				currentBallPosition.y = 0.f;
 				currentBallPosition.x = 0.f;
@@ -680,8 +666,16 @@ else if(brickCount == 12){
 	currentBallPosition.x = 0.f;
 	currentBallPosition.y = 0.f;
 }
+
+
+
 	Paddle.setLocalPosition(currentPaddlePosition);
 	ball.setLocalPosition(currentBallPosition);
+
+	currentBallPosition = ball.getLocalPosition();
+	glm::vec3 ballVel = ((currentBallPosition - previousPosition) / deltaTime);
+
+
 	wall1.update(deltaTime);
 	wall2.update(deltaTime);
 	wall3.update(deltaTime);
@@ -696,6 +690,33 @@ else if(brickCount == 12){
 	wall12.update(deltaTime);
 	ball.update(deltaTime);
 	Paddle.update(deltaTime);
+
+	if (time <= 0.f)
+	{
+		// Code to send position updates go HERE...
+		char message[BUFLEN];
+		//char message2[BUFLEN];
+
+		std::string msg = std::to_string(clientId) + "$" + std::to_string(brickCount) + "=" + std::to_string(ball.localPosition.x) + "@" + std::to_string(ball.localPosition.y) + "_" + std::to_string(Paddle.localPosition.x) + "(" + std::to_string(Paddle.localPosition.y)
+			+ "/" + std::to_string(ballVel.x) + " " + std::to_string(ballVel.y);
+
+
+		strcpy(message, (char*)msg.c_str());
+
+
+		if (sendto(client_socket, message, BUFLEN, 0, ptr->ai_addr, ptr->ai_addrlen) == SOCKET_ERROR)
+		{
+			std::cout << "Sendto() failed...\n" << std::endl;
+		}
+
+		std::cout << "Ball position X and Ball position Y: " << message << std::endl;
+		std::cout << "Update Interval: " << UPDATE_INTERVAL << std::endl;
+		memset(message, '/0', BUFLEN);
+
+		time = UPDATE_INTERVAL; // reset the timer
+
+	}
+
 	if (count <= 121) {
 		count++;
 	}
