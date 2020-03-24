@@ -314,6 +314,7 @@ void game::update() {
 	glm::vec3 currentPaddlePosition = Paddle.getLocalPosition();
 	glm::vec3 currentBallPosition = ball.getLocalPosition();
 	glm::vec3 previousPosition = currentBallPosition;
+	glm::vec3 previousPaddlePosition = currentPaddlePosition;
 
 	if (ballCount <= 3) {
 		if (brickCount <= 12) {
@@ -672,9 +673,10 @@ else if(brickCount == 12){
 	Paddle.setLocalPosition(currentPaddlePosition);
 	ball.setLocalPosition(currentBallPosition);
 
+	currentPaddlePosition = Paddle.getLocalPosition();
 	currentBallPosition = ball.getLocalPosition();
 	glm::vec3 ballVel = ((currentBallPosition - previousPosition) / deltaTime);
-
+	glm::vec3 paddleVel = ((currentPaddlePosition - previousPaddlePosition) / deltaTime);
 
 	wall1.update(deltaTime);
 	wall2.update(deltaTime);
@@ -698,7 +700,7 @@ else if(brickCount == 12){
 		//char message2[BUFLEN];
 
 		std::string msg = std::to_string(clientId) + "$" + std::to_string(brickCount) + "=" + std::to_string(ball.localPosition.x) + "@" + std::to_string(ball.localPosition.y) + "_" + std::to_string(Paddle.localPosition.x) + "(" + std::to_string(Paddle.localPosition.y)
-			+ "/" + std::to_string(ballVel.x) + " " + std::to_string(ballVel.y);
+			+ "/" + std::to_string(ballVel.x) + " " + std::to_string(ballVel.y) + "]" + std::to_string(paddleVel.x);
 
 
 		strcpy(message, (char*)msg.c_str());
