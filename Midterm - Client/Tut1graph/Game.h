@@ -55,7 +55,7 @@ public:
 	Shader PhongColourSides;
 	std::vector<Light> pointLights;
 	Light directionalLight;
-	int clientId = 0;
+	std::string clientId;
 
 
 	bool wall1Spawn = false;

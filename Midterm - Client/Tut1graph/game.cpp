@@ -69,7 +69,8 @@ std::cout << "Please enter your IP address" << std::endl;
 std::getline(std::cin, IPadd);
 
 srand(time(NULL));
-clientId = rand();
+std::cout << "Please enter a username" << std::endl;
+std::getline(std::cin, clientId); 
 glEnable(GL_DEPTH_TEST);
 Paddle.setLocalPosition(glm::vec3(0.f, -5.0f, 0.f));
 ball.setLocalPosition(glm::vec3(-2.f, 0.0f, 0.f));
@@ -699,7 +700,7 @@ else if(brickCount == 12){
 		char message[BUFLEN];
 		//char message2[BUFLEN];
 
-		std::string msg = std::to_string(clientId) + "$" + std::to_string(brickCount) + "=" + std::to_string(ball.localPosition.x) + "@" + std::to_string(ball.localPosition.y) + "_" + std::to_string(Paddle.localPosition.x) + "(" + std::to_string(Paddle.localPosition.y)
+		std::string msg = clientId + "$" + std::to_string(brickCount) + "=" + std::to_string(ball.localPosition.x) + "@" + std::to_string(ball.localPosition.y) + "_" + std::to_string(Paddle.localPosition.x) + "(" + std::to_string(Paddle.localPosition.y)
 			+ "/" + std::to_string(ballVel.x) + " " + std::to_string(ballVel.y) + "]" + std::to_string(paddleVel.x);
 
 

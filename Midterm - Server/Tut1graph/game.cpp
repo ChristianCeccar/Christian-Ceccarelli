@@ -289,7 +289,7 @@ int count = 0;
 int ballCount = 0;
 int brickCount = 0;
 
-unsigned int player1 = 0;
+std::string player1;
 int spectate = 1;
 
 glm::vec3 ballLocation1 = { 0,0,0 };
@@ -300,7 +300,8 @@ glm::vec3 paddleLocation2 = { 0,0,0 };
 
 int player1Score = 0;
 int player2Score = 0;
-
+std::vector<std::string> usernames;
+int countNames = 0;
 void game::update() {
 	updateTimer->tick();
 
@@ -334,23 +335,37 @@ void game::update() {
 		std::string sub1 = temp.substr(temp.find("=") + 1, temp.find("_") - temp.find("=") - 1);
 		std::string sub2 = temp.substr(temp.find("_") + 1, temp.size() - temp.find("_"));
 
-		
+		if (usernames.size() <= 0) {
+			usernames.push_back(sub0);
+		}
+		else {
+			int newCount = 0;
+			for (int i = 0; i < usernames.size(); i++) {
+				if (std::strcmp(sub0.c_str(), usernames[i].c_str()) > 0) {
+					newCount++;
+				}
+			}
+			if (newCount == usernames.size()) {
+				usernames.push_back(sub0);
+			}
+		}
 
-		if (player1 == 0) {
-			player1 = std::stoi(sub0);
+		if (player1 == "") {
+			player1 = sub0;
 		}
 
 		std::size_t pos = sub1.find('@');
 		sub1 = sub1.substr(0, pos - 1);
-		if (std::stoi(sub0) == player1) {
+		if (sub0 == player1) {
 			ballLocation1.x = std::stof(sub1);
 		}
 		else {
-		ballLocation2.x = std::stoi(sub1);
+			ballLocation2.x = std::stoi(sub1);
 		}
+
 		sub1 = temp.substr(temp.find("=") + 1, temp.find("_") - temp.find("="));
 		sub1 = sub1.substr(pos + 1);
-		if (std::stoi(sub0) == player1) {
+		if (sub0 == player1) {
 			ballLocation1.y = std::stof(sub1);
 		}
 		else {
@@ -359,7 +374,7 @@ void game::update() {
 
 		pos = sub2.find('(');
 		sub2 = sub2.substr(0, pos - 1);
-		if (std::stoi(sub0) == player1) {
+		if (sub0 == player1) {
 			paddleLocation1.x = std::stof(sub2);
 		}
 		else {
@@ -367,7 +382,7 @@ void game::update() {
 		}
 		sub2 = temp.substr(temp.find("_") + 1, temp.size() - temp.find("_"));
 		sub2 = sub2.substr(pos + 1);
-		if (std::stoi(sub0) == player1) {
+		if (sub0 == player1) {
 			paddleLocation1.y = std::stof(sub2);
 		}
 		else {
@@ -382,12 +397,10 @@ void game::update() {
 			ball.setLocalPosition(ballLocation2);
 			Paddle.setLocalPosition(paddleLocation2);
 		}
-		
-		std::cout << "watching player: " << spectate << std::endl;
-		
-		std::cout << "recieved from: " << sub0 << std::endl;
 
-		if (std::stoi(sub0) == player1) {
+		std::cout << "watching player: " << usernames[spectate - 1] << std::endl;
+
+		if (sub0 == player1) {
 			player1Score = std::stoi(sub05);
 		}
 
@@ -401,11 +414,17 @@ void game::update() {
 		else {
 			std::cout << "score: " << player2Score << std::endl;
 		}
+
 		std::cout << "balls position: " << ball.localPosition.x << "," << ball.localPosition.y << std::endl;
 		std::cout << "paddle position: " << Paddle.localPosition.x << "," << Paddle.localPosition.y << std::endl << std::endl;
+
+		printf("List of Players\n");
+
+		for (int i = 0; i < usernames.size(); i++) {
+			printf("%s\n", usernames[i].c_str());
+		}
 	}
 	
-
 
 	float deltaTime = updateTimer->getElapsedTimeS();
 
@@ -415,14 +434,16 @@ void game::update() {
 
 	if (ballCount <= 2) {
 		if (brickCount <= 12) {
-			if (GetAsyncKeyState(VK_SPACE)) {
+			if (GetAsyncKeyState('1')) {
 				spectate = 1;
 				
 			}
 
-			if (GetAsyncKeyState(VK_F1)) {
+			if (GetAsyncKeyState('2')) {
 				spectate = 2;
 			}
+
+			
 			//else if (GetAsyncKeyState(VK_RIGHT)) {
 			//	// = glm::translate(paddleTransform, glm::vec3(0.3f, 0.f, 0.f));
 			//	currentPaddlePosition.x += 0.2f;
@@ -822,17 +843,15 @@ void game::keyDown(unsigned char key, int mouseX, int mouseY) {
 		std::cout << "total: "
 			<< updateTimer->getCurrentTime() / 1000.0f << std::endl;
 	case ' ':
-
-		if (Spin == true)
-		{
-			Spin = false;
+		if (countNames < usernames.size() - 1) {
+			countNames++;
 		}
-		else
-		{
-			Spin = true;
+		else if (countNames == usernames.size() - 1) {
+			countNames = 0;
 		}
-
+		
 		break;
+
 	case 'l':
 		shouldLightSpin = !shouldLightSpin;
 		break;
