@@ -700,7 +700,8 @@ else if(brickCount == 12){
 		char message[BUFLEN];
 		//char message2[BUFLEN];
 
-		std::string msg = clientId + "$" + std::to_string(brickCount) + "=" + std::to_string(ball.localPosition.x) + "@" + std::to_string(ball.localPosition.y) + "_" + std::to_string(Paddle.localPosition.x) + "(" + std::to_string(Paddle.localPosition.y)
+		std::string msg = clientId + "$" + std::to_string(brickCount) + "=" + std::to_string(ball.localPosition.x) + "@" + std::to_string(ball.localPosition.y) 
+			+ "_" + std::to_string(Paddle.localPosition.x) + "(" + std::to_string(Paddle.localPosition.y)
 			+ "/" + std::to_string(ballVel.x) + " " + std::to_string(ballVel.y) + "]" + std::to_string(paddleVel.x);
 
 

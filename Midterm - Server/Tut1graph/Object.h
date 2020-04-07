@@ -83,6 +83,8 @@ public:
 	glm::mat4 localTransformMatrix;
 	glm::mat4 localToWorldMatrix;
 
+	glm::vec3 velocity;
+
 	//glm::vec3 getPosition();
 
 	std::string name;

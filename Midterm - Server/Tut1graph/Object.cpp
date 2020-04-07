@@ -4,6 +4,7 @@
 Object::Object()
 {
 	scale = 1.0f;
+	velocity = glm::vec3(0.f);
 }
 
 //Deconstructs object by unloading mesh
@@ -31,6 +32,7 @@ void Object::update(float dt) {
 
 		localRotation = rxz * ry;
 	}
+
 	// Create translation matrix
 	glm::mat4 tran = glm::translate(localPosition);
 

@@ -298,6 +298,12 @@ glm::vec3 ballLocation2 = { 0,0,0 };
 glm::vec3 paddleLocation1 = { 0,0,0 };
 glm::vec3 paddleLocation2 = { 0,0,0 };
 
+glm::vec3 ballVelocity1 = { 0,0,0 };
+glm::vec3 ballVelocity2 = { 0,0,0 };
+
+glm::vec3 paddleVelocity1 = { 0,0,0 };
+glm::vec3 paddleVelocity2 = { 0,0,0 };
+
 int player1Score = 0;
 int player2Score = 0;
 std::vector<std::string> usernames;
@@ -305,14 +311,10 @@ int countNames = 0;
 void game::update() {
 	updateTimer->tick();
 
-
-
 	char buf[BUFLEN];
 	struct sockaddr_in fromAdder;
 	int fromLen;
 	fromLen = sizeof(fromAdder);
-
-
 
 	memset(buf, 0, BUFLEN);
 
@@ -323,17 +325,19 @@ void game::update() {
 
 	sError = WSAGetLastError();
 
-
-
 	if (sError != WSAEWOULDBLOCK && bytes_received > 0)
 	{
 		char* ipString = inet_ntoa(fromAdder.sin_addr);
 		std::string temp = buf;
 
-		std::string sub0 = temp.substr(0, temp.find("$"));
-		std::string sub05 = temp.substr(temp.find("$") + 1, temp.find("=") - temp.find("$") - 1);
-		std::string sub1 = temp.substr(temp.find("=") + 1, temp.find("_") - temp.find("=") - 1);
-		std::string sub2 = temp.substr(temp.find("_") + 1, temp.size() - temp.find("_"));
+		std::string sub0	= temp.substr(0					, temp.find("$")					 );
+		std::string sub05	= temp.substr(temp.find("$") + 1, temp.find("=") - temp.find("$") - 1);
+		std::string sub1	= temp.substr(temp.find("=") + 1, temp.find("_") - temp.find("=") - 1);
+		std::string sub2	= temp.substr(temp.find("_") + 1, temp.find("(") - temp.find("_") - 1);
+		std::string sub3	= temp.substr(temp.find("(") + 1, temp.find("/") - temp.find("(") - 1);
+		std::string sub4	= temp.substr(temp.find("/") + 1, temp.find(" ") - temp.find("/") - 1);
+		std::string sub5	= temp.substr(temp.find(" ") + 1, temp.find("]") - temp.find(" ") - 1);
+		std::string sub6	= temp.substr(temp.find("]") + 1									 );
 
 		if (usernames.size() <= 0) {
 			usernames.push_back(sub0);
@@ -358,27 +362,33 @@ void game::update() {
 		sub1 = sub1.substr(0, pos - 1);
 		if (sub0 == player1) {
 			ballLocation1.x = std::stof(sub1);
+			ballVelocity1.x = std::stof(sub4);
 		}
 		else {
-			ballLocation2.x = std::stoi(sub1);
+			ballLocation2.x = std::stof(sub1);
+			ballVelocity2.x = std::stof(sub4);
 		}
 
 		sub1 = temp.substr(temp.find("=") + 1, temp.find("_") - temp.find("="));
 		sub1 = sub1.substr(pos + 1);
 		if (sub0 == player1) {
 			ballLocation1.y = std::stof(sub1);
+			ballVelocity1.y = std::stof(sub5);
 		}
 		else {
 			ballLocation2.y = std::stof(sub1);
+			ballVelocity2.y = std::stof(sub5);
 		}
 
 		pos = sub2.find('(');
 		sub2 = sub2.substr(0, pos - 1);
 		if (sub0 == player1) {
 			paddleLocation1.x = std::stof(sub2);
+			paddleVelocity1.x = std::stof(sub6);
 		}
 		else {
 			paddleLocation2.x = std::stof(sub2);
+			paddleVelocity2.x = std::stof(sub6);
 		}
 		sub2 = temp.substr(temp.find("_") + 1, temp.size() - temp.find("_"));
 		sub2 = sub2.substr(pos + 1);
@@ -392,10 +402,14 @@ void game::update() {
 		if (spectate == 1) {
 			ball.setLocalPosition(ballLocation1);
 			Paddle.setLocalPosition(paddleLocation1);
+			ball.velocity = ballVelocity1;
+			Paddle.velocity = paddleVelocity1;
 		}
 		else {
 			ball.setLocalPosition(ballLocation2);
 			Paddle.setLocalPosition(paddleLocation2);
+			ball.velocity = ballVelocity2;
+			Paddle.velocity = paddleVelocity2;
 		}
 
 		std::cout << "watching player: " << usernames[spectate - 1] << std::endl;
@@ -422,6 +436,16 @@ void game::update() {
 
 		for (int i = 0; i < usernames.size(); i++) {
 			printf("%s\n", usernames[i].c_str());
+		}
+	}
+	else{
+		if (spectate == 1) {
+			Paddle.setLocalPosition(paddleLocation1 + paddleVelocity1);
+			ball.setLocalPosition(ballLocation1 + ballVelocity1);
+		}
+		else {
+			Paddle.setLocalPosition(paddleLocation2 + paddleVelocity2);
+			ball.setLocalPosition(ballLocation2 + ballVelocity2);
 		}
 	}
 	
